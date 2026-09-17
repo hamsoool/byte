@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0a0a09;
+  --paper: #f2efe6;
+  --dim: #6f6d63;
+  --line: #2a2924;
+  --acid: #d8f24e;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-dim: var(--dim);
+  --color-line: var(--line);
+  --color-acid: var(--acid);
+  --font-display: "Unbounded Variable", ui-sans-serif, sans-serif;
+  --font-body: "Space Grotesk Variable", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--ink);
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: "Space Grotesk Variable", ui-sans-serif, sans-serif;
+}
+
+::selection {
+  background: var(--acid);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dim);
+}
+
+/* Atmospheric studio lighting effects */
+.lamp-glow {
+  box-shadow: 0 0 40px 10px rgba(216, 242, 78, 0.25), 0 0 80px 30px rgba(216, 242, 78, 0.1);
+}
+
+.volumetric-cone {
+  clip-path: polygon(38% 0%, 62% 0%, 100% 100%, 0% 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(216, 242, 78, 0.45) 0%,
+    rgba(216, 242, 78, 0.22) 20%,
+    rgba(216, 242, 78, 0.08) 55%,
+    rgba(216, 242, 78, 0.01) 85%,
+    transparent 100%
+  );
+}
+
+.floor-spotlight {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(216, 242, 78, 0.35) 0%,
+    rgba(216, 242, 78, 0.12) 40%,
+    rgba(216, 242, 78, 0.03) 65%,
+    transparent 75%
+  );
+}
+
+@keyframes lampFlicker {
+  0% { opacity: 0.1; }
+  15% { opacity: 0.85; }
+  25% { opacity: 0.3; }
+  40% { opacity: 0.95; }
+  55% { opacity: 0.7; }
+  70% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+.animate-lamp-ignite {
+  animation: lampFlicker 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}

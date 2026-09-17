@@ -15,6 +15,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
   const [lampIntensities, setLampIntensities] = useState<number[]>([0, 0, 0]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [stageProgress, setStageProgress] = useState(0);
 
   // Detect mobile viewport
   useEffect(() => {
@@ -38,6 +39,8 @@ export default function StageExperience({ members }: StageExperienceProps) {
         0,
         Math.min(1, -rect.top / totalScrollable)
       );
+
+      setStageProgress(currentProgress);
 
       const ranges = [
         { min: 0.14, peakMin: 0.2, peakMax: 0.32, max: 0.38 },
@@ -89,6 +92,10 @@ export default function StageExperience({ members }: StageExperienceProps) {
   };
 
   const lampPositions = [22, 50, 78];
+  const teamIntroOpacity = Math.max(
+    0,
+    Math.min(1, (0.14 - stageProgress) / 0.07)
+  );
 
   return (
     <div
@@ -117,12 +124,31 @@ export default function StageExperience({ members }: StageExperienceProps) {
         <div
           className="pointer-events-none absolute inset-0 flex items-center justify-center text-center transition-opacity duration-700"
           style={{
-            opacity: activeLamp === null && lampIntensities.every((v) => v < 0.1) ? 0.8 : 0.04,
+            opacity:
+              stageProgress >= 0.14 &&
+              activeLamp === null &&
+              lampIntensities.every((v) => v < 0.1)
+                ? 0.8
+                : 0.04,
           }}
         >
           <span className="font-display text-[clamp(4rem,14vw,12rem)] tracking-tighter text-paper/10 select-none">
             BYTE.
           </span>
+        </div>
+
+        {/* Scroll-led introduction before the first member is revealed */}
+        <div
+          aria-hidden={teamIntroOpacity === 0}
+          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 text-center"
+          style={{
+            opacity: teamIntroOpacity,
+            transform: `translateY(${-24 * (1 - teamIntroOpacity)}px)`,
+          }}
+        >
+          <h2 className="font-display text-[clamp(2.75rem,9vw,7.5rem)] leading-[0.9] tracking-[-0.055em] text-paper">
+            MEET THE TEAM
+          </h2>
         </div>
 
         {/* ============================================================ */}
@@ -168,7 +194,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
         {/* MEMBER DETAILS UNDER ILLUMINATION */}
         {/* ============================================================ */}
         <div className="pointer-events-none absolute inset-0 flex items-end justify-center pb-12 sm:pb-16 px-4">
-          <div className="w-full max-w-6xl relative h-[62vh] flex items-center justify-center">
+          <div className="relative flex h-[62vh] w-full items-center justify-center">
             {members.map((member, index) => {
               const intensity = lampIntensities[index] || 0;
               const isVisible = intensity > 0.08;

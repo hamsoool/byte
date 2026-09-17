@@ -25,6 +25,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
   background: var(--ink);
 }
 
@@ -82,16 +83,39 @@ body {
   );
 }
 
-@keyframes lampFlicker {
-  0% { opacity: 0.1; }
-  15% { opacity: 0.85; }
-  25% { opacity: 0.3; }
-  40% { opacity: 0.95; }
-  55% { opacity: 0.7; }
-  70% { opacity: 1; }
-  100% { opacity: 1; }
+@keyframes lampIgnitionFlicker {
+  0%, 8% { filter: brightness(0.18); }
+  10% { filter: brightness(1.8); }
+  18% { filter: brightness(0.35); }
+  26% { filter: brightness(1.35); }
+  34% { filter: brightness(0.55); }
+  46% { filter: brightness(1.6); }
+  58% { filter: brightness(0.72); }
+  72%, 100% { filter: brightness(1); }
 }
 
-.animate-lamp-ignite {
-  animation: lampFlicker 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+.lamp-igniting {
+  animation: lampIgnitionFlicker 0.68s steps(1, end) both;
+}
+
+@keyframes teamNameFlicker {
+  0%, 8% { opacity: 0.08; }
+  10% { opacity: 1; }
+  18% { opacity: 0.18; }
+  26% { opacity: 0.9; }
+  34% { opacity: 0.28; }
+  46% { opacity: 1; }
+  58% { opacity: 0.58; }
+  72%, 100% { opacity: 1; }
+}
+
+.team-name-flicker {
+  animation: teamNameFlicker 0.68s steps(1, end) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lamp-igniting,
+  .team-name-flicker {
+    animation: none;
+  }
 }

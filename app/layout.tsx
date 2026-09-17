@@ -5,7 +5,7 @@ import "@fontsource-variable/jetbrains-mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BYTE — Being Your Technology Experts",
+  title: "BYTE - Being Your Technology Experts",
   description:
     "BYTE is a three-person technology studio. Meet the team behind the work.",
 };

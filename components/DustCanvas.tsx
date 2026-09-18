@@ -20,11 +20,18 @@ interface Particle {
 export default function DustCanvas({ intensity, beamWidth = 320 }: DustCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const intensityRef = useRef(intensity);
-  intensityRef.current = intensity;
+
+  useEffect(() => {
+    intensityRef.current = intensity;
+  }, [intensity]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;

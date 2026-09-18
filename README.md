@@ -29,14 +29,13 @@ Everything about the three members lives in one file:
 data/members.ts
 ```
 
-Edit `name`, `role`, `bio`, `skills`, and `link` (currently `mailto:`
-addresses) — every section on the page regenerates from this array, in
-the order listed. Add or remove a person by adding or removing an entry;
-the scroll sequence and the nav's lamp-dot indicator both adapt
-automatically to however many members are in the array.
+Edit `name`, `role`, `bio`, `skills`, and `github`. The shared team email
+is exported as `companyEmail` from the same file. The member array drives
+every team section in the order listed. Add or remove a person by adding
+or removing an entry; the scroll sequence and lamp navigation adapt to
+the number of members.
 
-The bios and skill tags are placeholders right now — replace them with
-whatever each of you actually wants shown.
+The member bios and roles are maintained in the same data file.
 
 ## Swap the logo / add real photos
 

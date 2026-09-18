@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll } from "framer-motion";
+import { motion, useReducedMotion, useScroll } from "framer-motion";
 
 const navigation = [
   { label: "Team", href: "#spotlight-stage", mobile: true },
@@ -12,6 +12,7 @@ const navigation = [
 
 export default function Nav() {
   const { scrollYProgress } = useScroll();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex min-h-14 items-center justify-between border-b border-line/30 bg-ink/90 px-4 backdrop-blur-md sm:min-h-16 sm:px-8">
@@ -20,7 +21,10 @@ export default function Nav() {
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({
+            top: 0,
+            behavior: shouldReduceMotion ? "auto" : "smooth",
+          });
         }}
         className="flex min-h-11 items-center font-display text-sm tracking-widest text-paper transition-colors hover:text-acid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acid"
       >
@@ -32,7 +36,7 @@ export default function Nav() {
           <a
             key={item.href}
             href={item.href}
-            className={`${item.mobile ? "flex" : "hidden md:flex"} min-h-11 items-center px-2 font-mono text-[10px] tracking-wider text-dim transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acid sm:text-xs`}
+            className={`${item.mobile ? "flex" : "hidden md:flex"} type-meta min-h-11 items-center px-2 text-dim transition-colors hover:text-paper`}
           >
             {item.label}
           </a>

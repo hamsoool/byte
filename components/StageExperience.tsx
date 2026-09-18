@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mail, Check, Copy, ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Code2 } from "lucide-react";
+import { useReducedMotion } from "framer-motion";
 import type { Member } from "@/data/members";
 import LampFixture from "./LampFixture";
 
@@ -10,10 +11,10 @@ interface StageExperienceProps {
 }
 
 export default function StageExperience({ members }: StageExperienceProps) {
+  const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeLamp, setActiveLamp] = useState<number | null>(null);
   const [lampIntensities, setLampIntensities] = useState<number[]>([0, 0, 0]);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [stageProgress, setStageProgress] = useState(0);
 
@@ -82,13 +83,10 @@ export default function StageExperience({ members }: StageExperienceProps) {
     const totalScrollable = container.offsetHeight - window.innerHeight;
     const targetProgress = index === 0 ? 0.26 : index === 1 ? 0.53 : 0.81;
     const targetY = container.offsetTop + targetProgress * totalScrollable;
-    window.scrollTo({ top: targetY, behavior: "smooth" });
-  };
-
-  const copyEmail = (email: string, id: string) => {
-    navigator.clipboard.writeText(email);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2400);
+    window.scrollTo({
+      top: targetY,
+      behavior: shouldReduceMotion ? "auto" : "smooth",
+    });
   };
 
   const lampPositions = [22, 50, 78];
@@ -152,7 +150,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
             transform: `translateY(${-24 * (1 - teamIntroOpacity)}px)`,
           }}
         >
-          <h2 className="font-display text-[clamp(2.75rem,9vw,7.5rem)] leading-[0.9] tracking-[-0.055em] text-paper">
+          <h2 className="type-display-xl text-paper">
             MEET THE TEAM
           </h2>
         </div>
@@ -235,17 +233,17 @@ export default function StageExperience({ members }: StageExperienceProps) {
                   </span>
 
                   {/* Member Name */}
-                  <h2 className="font-display text-[clamp(1.45rem,7.5vw,2rem)] font-bold leading-[1.08] tracking-tight text-paper drop-shadow-md sm:text-3xl lg:text-4xl">
+                  <h2 className="font-display text-[clamp(1.65rem,7vw,2.5rem)] font-bold leading-[1.08] tracking-[-0.035em] text-paper drop-shadow-md">
                     {member.name}
                   </h2>
 
                   {/* Member Role */}
-                  <p className="mt-1.5 font-mono text-[11px] tracking-wide text-dim sm:text-sm">
+                  <p className="type-meta mt-2 text-dim">
                     {member.role}
                   </p>
 
                   {/* Bio */}
-                  <p className="mt-3 max-w-xs text-xs leading-relaxed text-paper/85 sm:max-w-sm sm:text-sm">
+                  <p className="type-body mt-4 max-w-xs text-paper/85 sm:max-w-sm">
                     {member.bio}
                   </p>
 
@@ -261,36 +259,17 @@ export default function StageExperience({ members }: StageExperienceProps) {
                     ))}
                   </ul>
 
-                  {/* Action Bar (Email Copy & Direct Link) */}
-                  <div className="mt-5 flex items-center gap-3">
-                    <button
-                      onClick={() =>
-                        copyEmail(member.link.replace("mailto:", ""), member.id)
-                      }
-                      className="group flex min-h-11 min-w-0 items-center gap-2 rounded-md border border-line bg-paper/5 px-3 font-mono text-[11px] tracking-wide text-paper transition-all duration-200 hover:border-acid hover:bg-paper/10 active:scale-95 sm:text-xs sm:tracking-wider"
-                      title="Click to copy email address"
-                    >
-                      {copiedId === member.id ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-acid" />
-                          <span className="text-acid">COPIED</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5 text-dim group-hover:text-paper" />
-                          <span>{member.link.replace("mailto:", "")}</span>
-                        </>
-                      )}
-                    </button>
-
-                    <a
-                      href={member.link}
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-line bg-paper/5 text-paper transition-colors hover:border-acid hover:text-acid"
-                      aria-label={`Send email to ${member.name}`}
-                    >
-                      <Mail className="h-3.5 w-3.5" />
-                    </a>
-                  </div>
+                  <a
+                    href={member.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="type-meta group mt-5 flex min-h-11 items-center gap-2 rounded-md border border-line bg-paper/5 px-4 text-paper transition-colors hover:border-acid hover:bg-paper/10 hover:text-acid"
+                    aria-label={`Open ${member.name}'s GitHub profile`}
+                  >
+                    <Code2 className="h-4 w-4" />
+                    <span>{member.github.replace("https://github.com/", "@")}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
                 </div>
               );
             })}
@@ -310,10 +289,10 @@ export default function StageExperience({ members }: StageExperienceProps) {
                     opacity: teamFinaleIntensity,
                   }}
                 >
-                  <p className="font-display text-[clamp(1.15rem,2.2vw,2.35rem)] font-bold leading-[1.08] tracking-tight text-paper drop-shadow-md">
+                  <p className="font-display text-[clamp(1.15rem,2.2vw,2.35rem)] font-bold leading-[1.08] tracking-[-0.03em] text-paper drop-shadow-md">
                     {member.name}
                   </p>
-                  <p className="mt-2 font-mono text-xs tracking-wide text-dim">
+                  <p className="type-meta mt-2 text-dim">
                     {member.role}
                   </p>
                 </div>
@@ -351,7 +330,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
                     }}
                   />
                   <span
-                    className="font-mono text-[11px] transition-colors"
+                    className="type-meta transition-colors"
                     style={{
                       color:
                         activeLamp === idx || isTeamFinale
@@ -367,7 +346,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
           </div>
 
           <div className="flex items-center gap-2 text-dim">
-            <ArrowDown className="mr-1 h-3.5 w-3.5 animate-bounce" />
+            <ArrowDown className="mr-1 h-3.5 w-3.5" />
           </div>
         </div>
       </div>

@@ -2,12 +2,18 @@
 
 import Image from "next/image";
 import { ArrowDown } from "lucide-react";
+import { useReducedMotion } from "framer-motion";
 
 export default function Hero() {
+  const shouldReduceMotion = useReducedMotion();
+
   const scrollToStage = () => {
     const stage = document.getElementById("spotlight-stage");
     if (stage) {
-      window.scrollTo({ top: stage.offsetTop + window.innerHeight * 0.25, behavior: "smooth" });
+      window.scrollTo({
+        top: stage.offsetTop + window.innerHeight * 0.25,
+        behavior: shouldReduceMotion ? "auto" : "smooth",
+      });
     }
   };
 
@@ -31,11 +37,11 @@ export default function Hero() {
       {/* Minimal Scroll Indicator */}
       <button
         onClick={scrollToStage}
-        className="group relative z-10 mt-5 flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 font-mono text-[11px] tracking-widest text-dim transition-colors hover:text-paper sm:mt-8 sm:gap-2"
+        className="group relative z-10 mt-5 flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 text-dim transition-colors hover:text-paper sm:mt-8 sm:gap-2"
         aria-label="Scroll to view members"
       >
-        <span>SCROLL</span>
-        <ArrowDown className="h-3.5 w-3.5 animate-bounce text-dim group-hover:text-paper transition-colors" />
+        <span className="type-kicker">Meet the team</span>
+        <ArrowDown className="h-3.5 w-3.5 text-dim transition-colors group-hover:text-paper" />
       </button>
     </section>
   );

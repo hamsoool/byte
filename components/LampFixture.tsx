@@ -35,7 +35,7 @@ export default function LampFixture({
           onClick();
         }
       }}
-      aria-label={`Spotlight for ${name}. Click to illuminate.`}
+      aria-label={`Activate spotlight for ${name}`}
     >
       {/* Electrical braided cord from ceiling */}
       <div

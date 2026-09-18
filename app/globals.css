@@ -3,7 +3,7 @@
 :root {
   --ink: #0a0a09;
   --paper: #f2efe6;
-  --dim: #6f6d63;
+  --dim: #99968a;
   --line: #2a2924;
   --acid: #d8f24e;
 }
@@ -25,6 +25,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
   background: var(--ink);
 }
 
@@ -82,16 +83,112 @@ body {
   );
 }
 
-@keyframes lampFlicker {
-  0% { opacity: 0.1; }
-  15% { opacity: 0.85; }
-  25% { opacity: 0.3; }
-  40% { opacity: 0.95; }
-  55% { opacity: 0.7; }
-  70% { opacity: 1; }
-  100% { opacity: 1; }
+@keyframes lampIgnitionFlicker {
+  0%, 8% { filter: brightness(0.18); }
+  10% { filter: brightness(1.8); }
+  18% { filter: brightness(0.35); }
+  26% { filter: brightness(1.35); }
+  34% { filter: brightness(0.55); }
+  46% { filter: brightness(1.6); }
+  58% { filter: brightness(0.72); }
+  72%, 100% { filter: brightness(1); }
 }
 
-.animate-lamp-ignite {
-  animation: lampFlicker 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+:where(a, button, [role="button"]):focus-visible {
+  outline: 3px solid var(--acid);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--ink);
+}
+
+.type-kicker {
+  font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 560;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.type-display-xl {
+  font-family: "Unbounded Variable", ui-sans-serif, sans-serif;
+  font-size: clamp(2.35rem, 8vw, 7rem);
+  font-weight: 720;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.type-display-lg {
+  font-family: "Unbounded Variable", ui-sans-serif, sans-serif;
+  font-size: clamp(2.15rem, 6vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.type-title {
+  font-family: "Unbounded Variable", ui-sans-serif, sans-serif;
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  font-weight: 620;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.type-lead {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  line-height: 1.55;
+  letter-spacing: -0.015em;
+}
+
+.type-body {
+  font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+  line-height: 1.65;
+}
+
+.type-meta {
+  font-family: "Space Grotesk Variable", ui-sans-serif, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 520;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+.lamp-igniting {
+  animation: lampIgnitionFlicker 0.68s steps(1, end) both;
+}
+
+@keyframes teamNameFlicker {
+  0%, 8% { opacity: 0.08; }
+  10% { opacity: 1; }
+  18% { opacity: 0.18; }
+  26% { opacity: 0.9; }
+  34% { opacity: 0.28; }
+  46% { opacity: 1; }
+  58% { opacity: 0.58; }
+  72%, 100% { opacity: 1; }
+}
+
+.team-name-flicker {
+  animation: teamNameFlicker 0.68s steps(1, end) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .lamp-igniting,
+  .team-name-flicker {
+    animation: none;
+  }
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mail, Check, Copy, ArrowDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Code2 } from "lucide-react";
+import { useReducedMotion } from "framer-motion";
 import type { Member } from "@/data/members";
 import LampFixture from "./LampFixture";
 
@@ -10,11 +11,12 @@ interface StageExperienceProps {
 }
 
 export default function StageExperience({ members }: StageExperienceProps) {
+  const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeLamp, setActiveLamp] = useState<number | null>(null);
   const [lampIntensities, setLampIntensities] = useState<number[]>([0, 0, 0]);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [stageProgress, setStageProgress] = useState(0);
 
   // Detect mobile viewport
   useEffect(() => {
@@ -39,6 +41,8 @@ export default function StageExperience({ members }: StageExperienceProps) {
         Math.min(1, -rect.top / totalScrollable)
       );
 
+      setStageProgress(currentProgress);
+
       const ranges = [
         { min: 0.14, peakMin: 0.2, peakMax: 0.32, max: 0.38 },
         { min: 0.4, peakMin: 0.46, peakMax: 0.6, max: 0.66 },
@@ -57,7 +61,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
       setLampIntensities(newIntensities);
 
       let maxIdx: number | null = null;
-      let maxVal = 0.35;
+      let maxVal = 0.08;
       newIntensities.forEach((val, idx) => {
         if (val > maxVal) {
           maxVal = val;
@@ -79,26 +83,32 @@ export default function StageExperience({ members }: StageExperienceProps) {
     const totalScrollable = container.offsetHeight - window.innerHeight;
     const targetProgress = index === 0 ? 0.26 : index === 1 ? 0.53 : 0.81;
     const targetY = container.offsetTop + targetProgress * totalScrollable;
-    window.scrollTo({ top: targetY, behavior: "smooth" });
-  };
-
-  const copyEmail = (email: string, id: string) => {
-    navigator.clipboard.writeText(email);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2400);
+    window.scrollTo({
+      top: targetY,
+      behavior: shouldReduceMotion ? "auto" : "smooth",
+    });
   };
 
   const lampPositions = [22, 50, 78];
+  const isTeamFinale = !isMobile && stageProgress >= 0.9;
+  const teamFinaleIntensity = Math.max(
+    0,
+    Math.min(1, (stageProgress - 0.9) / 0.03)
+  );
+  const teamIntroOpacity = Math.max(
+    0,
+    Math.min(1, (0.14 - stageProgress) / 0.07)
+  );
 
   return (
     <div
       ref={containerRef}
       id="spotlight-stage"
-      className="relative h-[440vh] bg-ink"
+      className="relative h-[440dvh] bg-ink md:h-[500vh]"
       aria-label="Three Lamp Spotlight Stage"
     >
       {/* Sticky Stage Viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between bg-ink">
+      <div className="sticky top-0 flex h-dvh w-full flex-col justify-between overflow-hidden bg-ink">
         {/* Subtle ambient ceiling bar */}
         <div
           aria-hidden="true"
@@ -117,12 +127,32 @@ export default function StageExperience({ members }: StageExperienceProps) {
         <div
           className="pointer-events-none absolute inset-0 flex items-center justify-center text-center transition-opacity duration-700"
           style={{
-            opacity: activeLamp === null && lampIntensities.every((v) => v < 0.1) ? 0.8 : 0.04,
+            opacity:
+              !isTeamFinale &&
+              stageProgress >= 0.14 &&
+              activeLamp === null &&
+              lampIntensities.every((v) => v < 0.1)
+                ? 0.8
+                : 0.04,
           }}
         >
           <span className="font-display text-[clamp(4rem,14vw,12rem)] tracking-tighter text-paper/10 select-none">
             BYTE.
           </span>
+        </div>
+
+        {/* Scroll-led introduction before the first member is revealed */}
+        <div
+          aria-hidden={teamIntroOpacity === 0}
+          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-6 text-center"
+          style={{
+            opacity: teamIntroOpacity,
+            transform: `translateY(${-24 * (1 - teamIntroOpacity)}px)`,
+          }}
+        >
+          <h2 className="type-display-xl text-paper">
+            MEET THE TEAM
+          </h2>
         </div>
 
         {/* ============================================================ */}
@@ -133,18 +163,21 @@ export default function StageExperience({ members }: StageExperienceProps) {
           style={{
             transform:
               isMobile && activeLamp !== null
-                ? `translateX(${(1 - activeLamp) * 100}%)`
+                ? `translateX(${-activeLamp * 100}%)`
                 : "none",
           }}
         >
           {members.map((member, index) => {
             const intensity = lampIntensities[index] || 0;
-            const isLit = activeLamp === index;
+            const displayIntensity = isTeamFinale
+              ? teamFinaleIntensity
+              : intensity;
+            const isLit = isTeamFinale || activeLamp === index;
             const desktopX = lampPositions[index];
 
             return (
               <div
-                key={member.id}
+                key={`${member.id}-${isTeamFinale ? "finale" : "solo"}`}
                 className="absolute top-0 pointer-events-auto transition-all duration-300"
                 style={{
                   left: isMobile ? `${index * 100 + 50}%` : `${desktopX}%`,
@@ -155,7 +188,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
                   id={member.id}
                   name={member.name}
                   isActive={isLit}
-                  intensity={intensity}
+                  intensity={displayIntensity}
                   cordHeightVh={14}
                   onClick={() => scrollToLamp(index)}
                 />
@@ -167,20 +200,20 @@ export default function StageExperience({ members }: StageExperienceProps) {
         {/* ============================================================ */}
         {/* MEMBER DETAILS UNDER ILLUMINATION */}
         {/* ============================================================ */}
-        <div className="pointer-events-none absolute inset-0 flex items-end justify-center pb-12 sm:pb-16 px-4">
-          <div className="w-full max-w-6xl relative h-[62vh] flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 flex items-end justify-center px-3 pb-14 sm:px-4 sm:pb-16">
+          <div className="relative flex h-[60dvh] w-full items-center justify-center sm:h-[62vh]">
             {members.map((member, index) => {
               const intensity = lampIntensities[index] || 0;
               const isVisible = intensity > 0.08;
               const desktopX = lampPositions[index];
               const initial = member.name.charAt(0);
 
-              if (!isVisible) return null;
+              if (!isVisible || isTeamFinale) return null;
 
               return (
                 <div
                   key={member.id}
-                  className="absolute pointer-events-auto flex flex-col items-center text-center transition-all duration-300 max-w-sm sm:max-w-md px-4"
+                  className="pointer-events-auto absolute flex w-full max-w-[22rem] flex-col items-center px-3 text-center transition-all duration-300 sm:max-w-md sm:px-4"
                   style={{
                     left: isMobile ? "50%" : `${desktopX}%`,
                     transform: "translateX(-50%)",
@@ -200,17 +233,17 @@ export default function StageExperience({ members }: StageExperienceProps) {
                   </span>
 
                   {/* Member Name */}
-                  <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl leading-tight text-paper tracking-tight font-bold drop-shadow-md">
+                  <h2 className="font-display text-[clamp(1.65rem,7vw,2.5rem)] font-bold leading-[1.08] tracking-[-0.035em] text-paper drop-shadow-md">
                     {member.name}
                   </h2>
 
                   {/* Member Role */}
-                  <p className="mt-1.5 font-mono text-xs sm:text-sm tracking-wide text-dim">
+                  <p className="type-meta mt-2 text-dim">
                     {member.role}
                   </p>
 
                   {/* Bio */}
-                  <p className="mt-3 text-xs sm:text-sm leading-relaxed text-paper/85 max-w-xs sm:max-w-sm">
+                  <p className="type-body mt-4 max-w-xs text-paper/85 sm:max-w-sm">
                     {member.bio}
                   </p>
 
@@ -226,71 +259,83 @@ export default function StageExperience({ members }: StageExperienceProps) {
                     ))}
                   </ul>
 
-                  {/* Action Bar (Email Copy & Direct Link) */}
-                  <div className="mt-5 flex items-center gap-3">
-                    <button
-                      onClick={() =>
-                        copyEmail(member.link.replace("mailto:", ""), member.id)
-                      }
-                      className="group flex items-center gap-2 rounded-md border border-line bg-paper/5 px-3 py-1.5 font-mono text-xs tracking-wider text-paper transition-all duration-200 hover:border-acid hover:bg-paper/10 active:scale-95"
-                      title="Click to copy email address"
-                    >
-                      {copiedId === member.id ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-acid" />
-                          <span className="text-acid">COPIED</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5 text-dim group-hover:text-paper" />
-                          <span>{member.link.replace("mailto:", "")}</span>
-                        </>
-                      )}
-                    </button>
-
-                    <a
-                      href={member.link}
-                      className="flex h-8 w-8 items-center justify-center rounded-md border border-line bg-paper/5 text-paper transition-colors hover:border-acid hover:text-acid"
-                      aria-label={`Send email to ${member.name}`}
-                    >
-                      <Mail className="h-3.5 w-3.5" />
-                    </a>
-                  </div>
+                  <a
+                    href={member.github}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="type-meta group mt-5 flex min-h-11 items-center gap-2 rounded-md border border-line bg-paper/5 px-4 text-paper transition-colors hover:border-acid hover:bg-paper/10 hover:text-acid"
+                    aria-label={`Open ${member.name}'s GitHub profile`}
+                  >
+                    <Code2 className="h-4 w-4" />
+                    <span>{member.github.replace("https://github.com/", "@")}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
                 </div>
               );
             })}
           </div>
         </div>
 
+        {/* Desktop finale: all three names share the stage */}
+        {isTeamFinale && (
+          <div className="pointer-events-none absolute inset-0 hidden items-end justify-center px-4 pb-24 md:flex">
+            <div className="relative h-[58vh] w-full">
+              {members.map((member, index) => (
+                <div
+                  key={member.id}
+                  className="team-name-flicker absolute top-1/2 w-[28vw] max-w-sm -translate-x-1/2 text-center"
+                  style={{
+                    left: `${lampPositions[index]}%`,
+                    opacity: teamFinaleIntensity,
+                  }}
+                >
+                  <p className="font-display text-[clamp(1.15rem,2.2vw,2.35rem)] font-bold leading-[1.08] tracking-[-0.03em] text-paper drop-shadow-md">
+                    {member.name}
+                  </p>
+                  <p className="type-meta mt-2 text-dim">
+                    {member.role}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ============================================================ */}
         {/* STAGE BOTTOM STATUS & NAVIGATION */}
         {/* ============================================================ */}
-        <div className="relative z-30 flex items-center justify-between px-6 py-4 sm:px-10 border-t border-line/40 bg-ink/90 backdrop-blur-sm">
+        <div className="relative z-30 flex min-h-14 items-center justify-between border-t border-line/40 bg-ink/90 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-sm sm:px-10 sm:py-4">
           {/* Member navigation indicators */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-4">
             {members.map((member, idx) => {
               const firstName = member.name.split(" ")[0];
               return (
                 <button
                   key={idx}
                   onClick={() => scrollToLamp(idx)}
-                  className="group flex items-center gap-1.5 py-1 text-dim transition-colors hover:text-paper"
+                  className="group flex min-h-11 items-center gap-1.5 px-1.5 text-dim transition-colors hover:text-paper"
                   aria-label={`Jump to ${member.name}`}
                 >
                   <span
                     className="h-1.5 w-1.5 rounded-full transition-all duration-300"
                     style={{
                       background:
-                        activeLamp === idx ? "var(--acid)" : "var(--line)",
+                        activeLamp === idx || isTeamFinale
+                          ? "var(--acid)"
+                          : "var(--line)",
                       boxShadow:
-                        activeLamp === idx ? "0 0 8px var(--acid)" : "none",
+                        activeLamp === idx || isTeamFinale
+                          ? "0 0 8px var(--acid)"
+                          : "none",
                     }}
                   />
                   <span
-                    className="font-mono text-[11px] transition-colors"
+                    className="type-meta transition-colors"
                     style={{
                       color:
-                        activeLamp === idx ? "var(--paper)" : "var(--dim)",
+                        activeLamp === idx || isTeamFinale
+                          ? "var(--paper)"
+                          : "var(--dim)",
                     }}
                   >
                     {firstName}
@@ -301,7 +346,7 @@ export default function StageExperience({ members }: StageExperienceProps) {
           </div>
 
           <div className="flex items-center gap-2 text-dim">
-            <ArrowDown className="h-3.5 w-3.5 animate-bounce" />
+            <ArrowDown className="mr-1 h-3.5 w-3.5" />
           </div>
         </div>
       </div>

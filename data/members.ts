@@ -4,37 +4,35 @@ export type Member = {
   role: string;
   bio: string;
   skills: string[];
-  link: string;
+  github: string;
 };
 
-// The three BYTE members. Bios, skill tags, and email links below are
-// placeholders — replace with whatever each of you actually wants shown.
-// Nothing else in the site needs to change: every section on the page is
-// generated from this array, in the order listed here.
+export const companyEmail = "bytedevtech@gmail.com";
+
 const members: Member[] = [
   {
     id: "01",
     name: "Hans Marcus Roberto V. Lacuesta",
     role: "Full Stack Developer",
-    bio: "Works across the stack at BYTE, from schema to shipped interface. Add a proper bio here.",
+    bio: "Builds across BYTE's stack, connecting application logic, data, and the interfaces people use.",
     skills: ["REACT", "NODE.JS", "SQL", "GIT"],
-    link: "mailto:hans@byte.dev",
+    github: "https://github.com/hamsoool",
   },
   {
     id: "02",
     name: "Icon Zeus R. Gonzales",
     role: "Full Stack Developer",
-    bio: "Works across the stack at BYTE, from schema to shipped interface. Add a proper bio here.",
+    bio: "Works across the front end and back end at BYTE, turning product requirements into complete web features.",
     skills: ["REACT", "NODE.JS", "SQL", "GIT"],
-    link: "mailto:icon@byte.dev",
+    github: "https://github.com/icz3us",
   },
   {
     id: "03",
     name: "Sander John Custodio",
-    role: "Full Stack Developer",
-    bio: "Works across the stack at BYTE, from schema to shipped interface. Add a proper bio here.",
+    role: "Frontend Developer",
+    bio: "Focuses on BYTE's front end, shaping responsive interfaces and the details that make them clear to use.",
     skills: ["REACT", "NODE.JS", "SQL", "GIT"],
-    link: "mailto:sander@byte.dev",
+    github: "https://github.com/sanjooo-wav",
   },
 ];
 

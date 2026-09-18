@@ -120,11 +120,11 @@ export default function MemberSpotlight({ member, index, total }: Props) {
           {member.name}
         </h2>
 
-        <p className="font-mono text-sm tracking-wide text-dim">
+        <p className="type-meta text-dim">
           {member.role}
         </p>
 
-        <p className="max-w-[38ch] text-base leading-relaxed text-paper/80">
+        <p className="type-body max-w-[38ch] text-paper/80">
           {member.bio}
         </p>
 
@@ -140,10 +140,12 @@ export default function MemberSpotlight({ member, index, total }: Props) {
         </ul>
 
         <a
-          href={member.link}
-          className="mt-2 font-mono text-xs tracking-wide text-paper underline decoration-line underline-offset-4 hover:decoration-acid"
+          href={member.github}
+          target="_blank"
+          rel="noreferrer"
+          className="type-meta mt-2 text-paper underline decoration-line underline-offset-4 hover:decoration-acid"
         >
-          {member.link.replace("mailto:", "")}
+          {member.github.replace("https://github.com/", "@")}
         </a>
       </motion.div>
     </section>
